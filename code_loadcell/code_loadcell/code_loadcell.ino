@@ -34,7 +34,9 @@ U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0);
 HX711_ADC LoadCell(4,16);
 
 long t;
-
+static int a1=0;
+static int a2=0;
+static int a3=0;
 void setup() {
    Serial.begin(115200);
  //Line 40 to line 48 set wifi for esp using smart config
@@ -71,6 +73,9 @@ void setup() {
 
  //Pin Esp connect gas sensor
      pinMode(5,INPUT_PULLUP);
+     pinMode(2,INPUT_PULLUP);
+     pinMode(23,INPUT_PULLUP);
+     pinMode(32,INPUT_PULLUP);
   
   Serial.println("Wait...");
 
@@ -80,7 +85,7 @@ void setup() {
   long stabilisingtime = 2000; 
   LoadCell.start(stabilisingtime);
   // user set calibration factor (float)
-  LoadCell.setCalFactor(100000); 
+  LoadCell.setCalFactor(10000); 
   Serial.println("Startup + tare is complete");
 }
 
@@ -90,15 +95,39 @@ void loop() {
   LoadCell.update();
 
   //get smoothed value from data set + current calibration factor
-  if (millis() > t + 250) {
+  if (millis() > t + 250 &&(a1==1|| a2==1 || a3==1) ) {
 
 // get value from loadcell
     float i = LoadCell.getData();
    i= fabs(i);
-
+   if(a1==1)
+   {
+    
+    i= i- 2.3;
+   }
+    if (a2==1)
+   {
+    
+     i= i- 5;
+    }
+   if (a3==1)
+   {
+    
+     i= i- 12.5;
+    }
+static float k ;
+if(i<0)
+{
+  k = 0;
+  }
+  else
+  {
+    k = i;
+    }
+   
    // create string to send to server and show in oled
     String payload = "";
-    payload += i;
+    payload += k;
     payload += "kg \n";
 
     //show the message if the quantity is smaller than 0.5kg
@@ -118,7 +147,12 @@ void loop() {
    //  sets the cursor location
    u8g2.setCursor(28, 18);
    //prints the variable in parentheses.
+   if(i <0)
+   {u8g2.print(0);}
+   else
+   {
    u8g2.print(i);
+   }
    // write something to the internal memory 
    u8g2.drawStr(65,18,"kg");  
    // publish a message on a topic "test_demo/load"
@@ -138,16 +172,29 @@ void loop() {
    //transfer internal memory to the display 
    u8g2.sendBuffer(); 
   }
-  //reset value loadcell
-  if(digitalRead(2)==1)
-  {
-
-   LoadCell.start(100); 
  
+if(digitalRead(23)==0)
+{
+  a1=0;
+  a2=0;
+  a3=1;
+ delay(1000);
   }
-  else
-  { 
+if(digitalRead(2)==1)
+{
+  a1=1;
+  a2=0;
+  a3=0;
+ delay(1000);
   }
+if(digitalRead(32)==0)
+{
+  a1=0;
+  a2=1;
+  a3=0;
+ delay(1000);
+  }
+
   //receive from serial terminal
   if (Serial.available() > 0) {
     float i;
