@@ -85,7 +85,7 @@ void setup() {
   long stabilisingtime = 2000; 
   LoadCell.start(stabilisingtime);
   // user set calibration factor (float)
-  LoadCell.setCalFactor(10000); 
+  LoadCell.setCalFactor(100000); 
   Serial.println("Startup + tare is complete");
 }
 
