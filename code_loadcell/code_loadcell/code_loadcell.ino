@@ -88,7 +88,7 @@ void setup() {
    u8g2.drawStr(1,18," SmartConfig done.");
    u8g2.sendBuffer();
   //Line 50 to 67 start by connecting to a WiFi network
-  WiFi.begin(ssid, password);
+ // WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
   delay(500);
   Serial.println("Connecting to WiFi..");
