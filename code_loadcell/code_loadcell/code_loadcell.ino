@@ -37,22 +37,67 @@ long t;
 static int a1=0;
 static int a2=0;
 static int a3=0;
+static int dem1=0;
+static int dem2=0;
+static int dem3=0;
 void setup() {
+  
    Serial.begin(115200);
  //Line 40 to line 48 set wifi for esp using smart config
    WiFi.mode(WIFI_AP_STA);
    WiFi.beginSmartConfig();
+            u8g2.begin();
+     u8g2.enableUTF8Print();
    while (!WiFi.smartConfigDone()) {
+    dem1++;
    delay(500);
    Serial.print(".");
+    Serial.print(dem1);
+    
+//         u8g2.begin();
+//     u8g2.enableUTF8Print();
+
+         //    u8g2.clearBuffer(); 
+   // choose a suitable font at https://github.com/olikraus/u8g2/wiki/fntlistall        
+   u8g2.setFont( u8g2_font_7x13B_mr   ); 
+    // write something to the internal memory 
+   u8g2.drawStr(1,18," Waiting SmartConfig.");
+   u8g2.sendBuffer(); 
+     
+   if(dem1> 40)
+   {
+    u8g2.clearBuffer(); 
+       u8g2.drawStr(10,18,"disconnected");
+   u8g2.sendBuffer(); 
+    delay(1000);
+    goto A1;
+    break;
+    }
+    else
+    {
+      
+      }
+   
   }
   Serial.println("");
   Serial.println("SmartConfig done.");
+   u8g2.clearBuffer(); 
+   // choose a suitable font at https://github.com/olikraus/u8g2/wiki/fntlistall        
+   u8g2.setFont( u8g2_font_7x13B_mr   ); 
+    // write something to the internal memory 
+   u8g2.drawStr(1,18," SmartConfig done.");
+   u8g2.sendBuffer();
   //Line 50 to 67 start by connecting to a WiFi network
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
   delay(500);
   Serial.println("Connecting to WiFi..");
+  u8g2.clearBuffer(); 
+   // choose a suitable font at https://github.com/olikraus/u8g2/wiki/fntlistall        
+   u8g2.setFont( u8g2_font_7x13B_mr   ); 
+    // write something to the internal memory 
+   u8g2.drawStr(1,18," Connecting to WiFi..");
+   u8g2.sendBuffer();
   }
   Serial.println("Connected to the WiFi network");
  
@@ -66,10 +111,13 @@ void setup() {
       Serial.print(client.state());
       delay(2000); 
     }
-  } 
+  }
+  A1: 
   // Start oled
      u8g2.begin();
      u8g2.enableUTF8Print();
+
+
 
  //Pin Esp connect gas sensor
      pinMode(5,INPUT_PULLUP);
@@ -87,6 +135,13 @@ void setup() {
   // user set calibration factor (float)
   LoadCell.setCalFactor(100000); 
   Serial.println("Startup + tare is complete");
+
+        u8g2.clearBuffer(); 
+   // choose a suitable font at https://github.com/olikraus/u8g2/wiki/fntlistall        
+   u8g2.setFont( u8g2_font_crox3tb_tf   ); 
+    // write something to the internal memory 
+   u8g2.drawStr(10,18,"press button");
+   u8g2.sendBuffer(); 
 }
 
 void loop() {
@@ -179,6 +234,7 @@ if(digitalRead(23)==0)
   a2=0;
   a3=1;
  delay(1000);
+ LoadCell.start(100);
   }
 if(digitalRead(2)==1)
 {
@@ -186,6 +242,7 @@ if(digitalRead(2)==1)
   a2=0;
   a3=0;
  delay(1000);
+ LoadCell.start(100);
   }
 if(digitalRead(32)==0)
 {
@@ -193,6 +250,7 @@ if(digitalRead(32)==0)
   a2=1;
   a3=0;
  delay(1000);
+ LoadCell.start(100);
   }
 
   //receive from serial terminal
